@@ -13,7 +13,6 @@ out
 wandb
 
 torchtitan/datasets/**/*.model
-assets/**/*.model
 
 # temp files
 *.log

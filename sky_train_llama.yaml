@@ -1,0 +1,62 @@
+name: torchtitan-2node-h100
+
+envs:
+  CONFIG_FILE: "/configs/llama3_8b.toml"  # your config file (mounted below)
+  WORLD_SIZE: "2"
+  DATASET: "xlam"
+  HF_TOKEN:
+  WANDB_API_KEY:
+
+resources:
+  cloud: kubernetes
+  accelerators: H100:1
+num_nodes: 2
+
+file_mounts:
+  /configs: ./configs   # sync your local config folder
+
+experimental:
+  config_overrides:
+    kubernetes:
+      pod_config:
+        spec:
+          containers:
+            - volumeMounts:
+                - mountPath: /mnt/data
+                  name: data-volume
+          volumes:
+            - name: data-volume
+              hostPath:
+                path: /mnt/data
+                type: Directory
+
+setup: |
+  echo "Cloning TorchTitan repo into shared filesystem..."
+  git clone https://github.com/HoomanRamezani/torchtitan-functioncalling.git /mnt/data/torchtitan || true
+  cd /mnt/data/torchtitan
+
+  pip install -r /torchtitan/requirements.txt
+  pip install nvidia-ml-py3 toml
+  pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu124 --force-reinstall
+
+  echo "Environment setup complete."
+  export NCCL_DEBUG=WARN
+  export PYTHONFAULTHANDLER=1
+  export NCCL_SOCKET_IFNAME="eth0,en,eth,em,bond"
+  export NCCL_BUFFSIZE=2097152
+  export NCCL_IB_DISABLE=1
+  export CUDA_LAUNCH_BLOCKING=0
+
+run: |
+  cd /mnt/data/torchtitan
+  MASTER_ADDR=$(echo "$SKYPILOT_NODE_IPS" | head -n1)
+  
+  torchrun \
+    --nnodes=$SKYPILOT_NUM_NODES \
+    --nproc_per_node=$SKYPILOT_NUM_GPUS_PER_NODE \
+    --master_addr=$MASTER_ADDR \
+    --master_port=8008 \
+    --node_rank=${SKYPILOT_NODE_RANK} \
+    ./torchtitan/train.py 
+    --job.config_file ${CONFIG_FILE}
+

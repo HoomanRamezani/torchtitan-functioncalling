@@ -25,9 +25,20 @@ def _load_c4_dataset(dataset_path: str):
     return load_dataset(dataset_path, name="en", split="train", streaming=True)
 
 
+def _load_xlam_dataset(dataset_path: str):
+    """Load XLAM for LLAMA 3."""
+    return load_dataset("hooman125/xlam-function-calling-60k-llama3", split="train", streaming=True)
+
+
 def _process_c4_text(sample: dict[str, Any]) -> str:
     """Process C4 dataset sample text."""
     return sample["text"]
+
+
+def _process_xlam_text(sample: dict[str, Any]) -> str:
+    """Process XLAM dataset sample text."""
+    return sample["text"]
+
 
 
 @dataclass
@@ -48,6 +59,11 @@ DATASETS = {
         path="tests/assets/c4_test",
         loader=lambda path: load_dataset(path, split="train"),
         text_processor=_process_c4_text,
+    ),
+    "xlam": DatasetConfig(
+        path="hooman125/xlam-function-calling-60k-llama3",
+        loader=lambda path: load_dataset(path, split="train"),
+        text_processor=_process_xlam_text,
     ),
 }
 
