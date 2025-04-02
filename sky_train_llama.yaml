@@ -33,11 +33,12 @@ experimental:
 setup: |
   echo "Cloning TorchTitan repo into shared filesystem..."
   git clone https://github.com/HoomanRamezani/torchtitan-functioncalling.git /mnt/data/torchtitan || true
+  echo "Successfully cloned TorchTitan repo into shared filesystem."
   cd /mnt/data/torchtitan
 
-  pip install -r /torchtitan/requirements.txt
-  pip install nvidia-ml-py3 toml
   pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu124 --force-reinstall
+  pip install -r requirements.txt
+  pip install numpy nvidia-ml-py3 toml
 
   echo "Environment setup complete."
   export NCCL_DEBUG=WARN
@@ -48,15 +49,18 @@ setup: |
   export CUDA_LAUNCH_BLOCKING=0
 
 run: |
+  echo "Starting finetune run:"
   cd /mnt/data/torchtitan
+  pwd
+
+  export PYTHONPATH=/mnt/data/torchtitan:$PYTHONPATH
   MASTER_ADDR=$(echo "$SKYPILOT_NODE_IPS" | head -n1)
-  
+
   torchrun \
     --nnodes=$SKYPILOT_NUM_NODES \
     --nproc_per_node=$SKYPILOT_NUM_GPUS_PER_NODE \
     --master_addr=$MASTER_ADDR \
     --master_port=8008 \
     --node_rank=${SKYPILOT_NODE_RANK} \
-    ./torchtitan/train.py 
-    --job.config_file ${CONFIG_FILE}
+    torchtitan/train.py --job.config_file ${CONFIG_FILE}
 

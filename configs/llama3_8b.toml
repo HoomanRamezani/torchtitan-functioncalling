@@ -1,6 +1,4 @@
 # torchtitan Config.toml
-# NOTE: this toml config is a preset for 64 A100 GPUs.
-
 [job]
 dump_folder = "./outputs"
 description = "Llama 3 8B training"
@@ -19,7 +17,7 @@ save_tb_folder = "tb"
 name = "llama3"
 flavor = "8B"
 norm_type = "rmsnorm"  # layernorm / np_layernorm / rmsnorm
-tokenizer_path = "/home/sky/.sky/file_mounts/original/tokenizer.model"  
+tokenizer_path = "./assets/tokenizer/original/tokenizer.model"  
 # converters = "float8"
 
 [optimizer]
