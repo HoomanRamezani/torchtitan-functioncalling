@@ -18,4 +18,4 @@ The dataset is tokenized into the llama expected format and imported through thi
 3. **Logging**
    - Training progress is logged using TensorBoard for easy monitoring and analysis.
 
-This setup ensures efficient distributed training and logging, tailored for function calling applications with Llama 3.1. 
+This setup ensures efficient distributed training and logging via 3D parallel / FSDP2, tailored for function calling applications with Llama 3.1. 
