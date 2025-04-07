@@ -2,7 +2,7 @@
 
 This repository is a fork of `https://github.com/pytorch/torchtitan` to facilitate additional training of Llama 3.1 models for function calling via the `Salesforce/xlam-function-calling-60k` dataset. The setup is optimized for running in a Kubernetes (K8s) environment using SkyPilot, setup for the 3.1 8B model out of the box
 
-The dataset is tokenized into the llama expected format and imported through this hugging face focumentation `hooman125/xlam-function-calling-60k-llama3`.
+The dataset is tokenized into the llama expected format and imported through this hugging face dataset `hooman125/xlam-function-calling-60k-llama3`.
 
 ## Quick Start
 
